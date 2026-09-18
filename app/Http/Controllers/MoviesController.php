@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 
 class MoviesController extends Controller
 {
-    // Sample data (no database needed)
     private function movies()
     {
         return [
@@ -58,14 +57,12 @@ class MoviesController extends Controller
         ];
     }
 
-    // Show all movies
     public function index()
     {
         $movies = $this->movies();
         return view('movies.index', compact('movies'));
     }
 
-    // Show one movie
     public function show($id)
     {
         $movies = collect($this->movies());
@@ -78,7 +75,6 @@ class MoviesController extends Controller
         return view('movies.show', compact('movie'));
     }
 
-    // Show the featured movie
     public function featured()
     {
         $movies = collect($this->movies());
@@ -87,7 +83,6 @@ class MoviesController extends Controller
         return view('movies.featured', compact('movie'));
     }
 
-    // Show only short movies (under 150 minutes / 2.5 hours)
     public function filter()
     {
         $movies = collect($this->movies())
