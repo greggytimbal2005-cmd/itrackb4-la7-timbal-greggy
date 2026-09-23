@@ -12,7 +12,7 @@ class MoviesController extends Controller
             [
                 'id'          => 1,
                 'title'       => 'Avatar: Aid of Passage',
-                'description' => 'The Avatar saga continues with groundbreaking visual effects and deeper lore of Pandora\'s indigenous Na\'vi culture.',
+                'description' => 'The Avatar saga continues with groundbreaking visual effects.',
                 'duration'    => 178,
                 'genre'       => 'Sci-Fi',
                 'featured'    => true,
@@ -21,7 +21,7 @@ class MoviesController extends Controller
             [
                 'id'          => 2,
                 'title'       => 'Mission: Impossible – Legacy Reborn',
-                'description' => 'Tom Cruise returns in the next evolution of the spy franchise with cutting-edge stunts and mystery-laden plotlines.',
+                'description' => 'Tom Cruise returns in the next evolution of the spy franchise.',
                 'duration'    => 162,
                 'genre'       => 'Action',
                 'featured'    => false,
@@ -30,7 +30,7 @@ class MoviesController extends Controller
             [
                 'id'          => 3,
                 'title'       => 'Wicked: For Good',
-                'description' => 'The second part of the highly anticipated film adaptation of the Broadway musical, a major musical event.',
+                'description' => 'The second part of the film adaptation of the Broadway musical.',
                 'duration'    => 165,
                 'genre'       => 'Musical',
                 'featured'    => false,
@@ -39,7 +39,7 @@ class MoviesController extends Controller
             [
                 'id'          => 4,
                 'title'       => 'Quantum Requiem',
-                'description' => 'A mind-bending sci-fi thriller about a physicist harnessing quantum anomalies to travel across timelines.',
+                'description' => 'A mind-bending sci-fi thriller about quantum anomalies.',
                 'duration'    => 155,
                 'genre'       => 'Sci-Fi',
                 'featured'    => false,
@@ -48,7 +48,7 @@ class MoviesController extends Controller
             [
                 'id'          => 5,
                 'title'       => 'The Supergirl Movie',
-                'description' => 'Part of the new DC Universe slate, introducing a fresh take on the iconic Kryptonian hero, Kara Zor-El.',
+                'description' => 'A fresh take on the iconic Kryptonian hero, Kara Zor-El.',
                 'duration'    => 145,
                 'genre'       => 'Action',
                 'featured'    => false,
@@ -57,10 +57,34 @@ class MoviesController extends Controller
         ];
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        $movies = $this->movies();
-        return view('movies.index', compact('movies'));
+        $filterGenre = $request->query('genre', '');
+        $filterYear = $request->query('year', '');
+
+        $movies = collect($this->movies());
+
+        if ($filterGenre) {
+            $movies = $movies->where('genre', $filterGenre);
+        }
+
+        if ($filterYear) {
+            $movies = $movies->where('year', (int)$filterYear);
+        }
+
+        $allMovies = $this->movies();
+
+        $genres = collect($allMovies)->pluck('genre')->unique()->sort();
+        $years = collect($allMovies)->pluck('year')->unique()->sort();
+
+        return view('movies.index', [
+            'movies'       => $movies->values()->all(),
+            'allMovies'    => $allMovies,
+            'genres'       => $genres,
+            'years'        => $years,
+            'filterGenre'  => $filterGenre,
+            'filterYear'   => $filterYear,
+        ]);
     }
 
     public function show($id)
@@ -81,15 +105,5 @@ class MoviesController extends Controller
         $movie  = $movies->firstWhere('featured', true) ?? $movies->first();
 
         return view('movies.featured', compact('movie'));
-    }
-
-    public function filter()
-    {
-        $movies = collect($this->movies())
-            ->filter(fn ($movie) => $movie['duration'] < 150)
-            ->values()
-            ->all();
-
-        return view('movies.filter', compact('movies'));
     }
 }
