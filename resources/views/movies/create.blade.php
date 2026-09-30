@@ -1,80 +1,284 @@
 @extends('layouts.app')
 
-@section('title', 'Add Student')
+@section('content')
 
-@section('content')  
+<div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+
+        <div>
+
+            <h1>Add New Movie</h1>
+
+            <p class="text-muted">
+                Add a new movie to the database.
+            </p>
+
+        </div>
+
+        <a href="{{ route('movies.index') }}"
+           class="btn btn-secondary">
+
+            ← Back to Movies
+
+        </a>
+
+    </div>
+
+
     <div class="card">
-        <div class="card-body">
-            <h3 class="card-title">Add Movie</h3>
 
-            <form method="POST" action="{{ route('movies.store') }}">
+        <div class="card-header bg-dark text-white">
+
+            Add Movie
+
+        </div>
+
+
+        <div class="card-body">
+
+            <form method="POST"
+                  action="{{ route('movies.store') }}">
+
                 @csrf
 
 
+                <!-- TITLE -->
+
                 <div class="mb-3">
-                    <label class="form-label">Title</label>
-                    <select type="text" name="Title" class="form-select">
-                        <option value="Title">Avatar: Aid of Passage</option>
-                        <option value="Title">Mission: Impossible – Legacy Reborn</option>
-                        <option value="Title">Wicked: For Good</option>
-                        <option value="Title">Quantum Requiem</option>
-                        <option value="Title">The Supergirl Movie</option>
-                    </select>
-                </div>  
-                
-                <div class="mb-3">
-                    <label class="form-label">Description</label>
-                    <select name="description" class="form-select">
-                        <option value="">-- Select a movie description --</option>
-                        <option value="1">Jake Sully and Neytiri face new threats in Pandora as they journey beyond familiar waters to protect their family and discover the truth about the Na'vi's ancient past.</option>
-                        <option value="2">Ethan Hunt faces his most dangerous mission yet as a rogue AI threatens global security. With his team fragmented and trust nowhere to be found, he must outrun both enemies and time itself.</option>
-                        <option value="3">Elphaba and Glinda's extraordinary friendship reaches its climax as the Wicked Witch faces her final battle against the Wizard, revealing shocking truths and unforgettable moments of magic and sacrifice.</option>
-                        <option value="4">When a physicist discovers that parallel realities are collapsing into one another, she must navigate quantum dimensions and confront alternate versions of herself to prevent universal extinction.</option>
-                        <option value="5">Kara Zor-El discovers her extraordinary powers in modern-day Earth and must embrace her destiny as Supergirl while protecting humanity from cosmic threats and uncovering secrets about her own heritage.</option>
-                    </select>
+
+                    <label for="title"
+                           class="form-label">
+
+                        Movie Title
+
+                    </label>
+
+                    <input
+                        type="text"
+                        id="title"
+                        name="title"
+                        value="{{ old('title') }}"
+                        class="form-control @error('title') is-invalid @enderror"
+                        placeholder="Enter movie title"
+                    >
+
+                    @error('title')
+
+                        <div class="invalid-feedback">
+
+                            {{ $message }}
+
+                        </div>
+
+                    @enderror
+
                 </div>
 
-                <div class="mb-3">
-                    <label class="form-label">duration</label>
-                    <select type="text" name="Duration" class="form-select">
-                        <option value="mins">178</option>
-                        <option value="mins">162</option>
-                         <option value="mins">165</option>
-                         <option value="mins">155</option>
-                         <option value="mins">145</option>
-                    </select>
-                </div>  
+
+                <!-- GENRE -->
 
                 <div class="mb-3">
-                    <label class="form-label">genre</label>
-                     <select type="text" name="genre" class="form-select">
-                        <option value="Sci-Fi">sci-fi</option>
-                        <option value="Musical">musical</option>
-                         <option value="Action">Action</option>
+
+                    <label for="genre"
+                           class="form-label">
+
+                        Genre
+
+                    </label>
+
+                    <select
+                        id="genre"
+                        name="genre"
+                        class="form-select @error('genre') is-invalid @enderror"
+                    >
+
+                        <option value="">
+                            Select Genre
+                        </option>
+
+                        <option value="Action"
+                            @selected(old('genre') === 'Action')>
+                            Action
+                        </option>
+
+                        <option value="Comedy"
+                            @selected(old('genre') === 'Comedy')>
+                            Comedy
+                        </option>
+
+                        <option value="Drama"
+                            @selected(old('genre') === 'Drama')>
+                            Drama
+                        </option>
+
+                        <option value="Horror"
+                            @selected(old('genre') === 'Horror')>
+                            Horror
+                        </option>
+
+                        <option value="Romance"
+                            @selected(old('genre') === 'Romance')>
+                            Romance
+                        </option>
+
+                        <option value="Sci-Fi"
+                            @selected(old('genre') === 'Sci-Fi')>
+                            Sci-Fi
+                        </option>
+
                     </select>
-                </div>  
+
+
+                    @error('genre')
+
+                        <div class="invalid-feedback">
+
+                            {{ $message }}
+
+                        </div>
+
+                    @enderror
+
+                </div>
+
+
+                <!-- DURATION -->
 
                 <div class="mb-3">
-                    <label class="form-label">featured</label>
-                    <select type="text" name="featured" class="form-select">
-                        <option value="false">false</option>
-                        <option value="true">True</option>
-                    </select>
-                </div>  
+
+                    <label for="duration"
+                           class="form-label">
+
+                        Duration (minutes)
+
+                    </label>
+
+                    <input
+                        type="number"
+                        id="duration"
+                        name="duration"
+                        value="{{ old('duration') }}"
+                        class="form-control @error('duration') is-invalid @enderror"
+                        placeholder="Example: 120"
+                    >
+
+                    @error('duration')
+
+                        <div class="invalid-feedback">
+
+                            {{ $message }}
+
+                        </div>
+
+                    @enderror
+
+                </div>
+
+
+                <!-- YEAR -->
 
                 <div class="mb-3">
-                    <label class="form-label">year</label>
-                    <select type="text" name="release_year" class="form-select">
-                        <option value="year">Select Year</option>
-                        <option value="year">2026</option>
-                        <option value="year">2025</option>
+
+                    <label for="year"
+                           class="form-label">
+
+                        Release Year
+
+                    </label>
+
+                    <input
+                        type="number"
+                        id="year"
+                        name="year"
+                        value="{{ old('year') }}"
+                        class="form-control @error('year') is-invalid @enderror"
+                        placeholder="Example: 2024"
+                    >
+
+                    @error('year')
+
+                        <div class="invalid-feedback">
+
+                            {{ $message }}
+
+                        </div>
+
+                    @enderror
+
+                </div>
+
+
+                <!-- FEATURED -->
+
+                <div class="mb-4">
+
+                    <label for="featured"
+                           class="form-label">
+
+                        Featured Movie
+
+                    </label>
+
+                    <select
+                        id="featured"
+                        name="featured"
+                        class="form-select @error('featured') is-invalid @enderror"
+                    >
+
+                        <option value="">
+                            Select an option
+                        </option>
+
+                        <option value="1"
+                            @selected(old('featured') === '1')>
+                            Yes
+                        </option>
+
+                        <option value="0"
+                            @selected(old('featured') === '0')>
+                            No
+                        </option>
+
                     </select>
-                </div>  
+
+
+                    @error('featured')
+
+                        <div class="invalid-feedback">
+
+                            {{ $message }}
+
+                        </div>
+
+                    @enderror
+
+                </div>
+
+
+                <!-- SUBMIT -->
+
+                <button type="submit"
+                        class="btn btn-primary">
+
+                    Add Movie
+
+                </button>
+
+
+                <a href="{{ route('movies.index') }}"
+                   class="btn btn-secondary">
+
+                    Cancel
+
+                </a>
+
             </form>
-        </div>
-            
-    </div>
-@endsection    
 
-    
-        
+        </div>
+
+    </div>
+
+</div>
+
+@endsection

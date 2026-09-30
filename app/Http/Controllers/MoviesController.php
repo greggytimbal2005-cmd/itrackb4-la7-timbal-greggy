@@ -6,63 +6,168 @@ use Illuminate\Http\Request;
 
 class MoviesController extends Controller
 {
-    // Private helper to read movies from JSON file
+
     private function readMovies()
     {
-        $path = storage_path('movies.json');
-        
+        $path = storage_path('app/movies.json');
+
         if (!file_exists($path)) {
             return [];
         }
-        
+
         $json = file_get_contents($path);
-        return json_decode($json, true) ?? [];
+
+        $movies = json_decode($json, true);
+
+        if (!is_array($movies)) {
+            return [];
+        }
+
+        return $movies;
     }
 
-    // List all movies with filtering
+    private function writeMovies(array $movies)
+    {
+        $path = storage_path('app/movies.json');
+
+        file_put_contents(
+            $path,
+            json_encode($movies, JSON_PRETTY_PRINT)
+        );
+    }
+
     public function index(Request $request)
     {
         $filterGenre = $request->query('genre', '');
         $filterYear = $request->query('year', '');
 
-        $movies = collect($this->readMovies());
+        $allMovies = $this->readMovies();
 
-        if ($filterGenre) {
+        $movies = collect($allMovies);
+
+
+        if ($filterGenre !== '') {
             $movies = $movies->where('genre', $filterGenre);
         }
 
-        if ($filterYear) {
-            $movies = $movies->where('year', (int)$filterYear);
+
+        if ($filterYear !== '') {
+            $movies = $movies->where('year', (int) $filterYear);
         }
 
-        $allMovies = $this->readMovies();
 
-        // Get unique genres and years for filter buttons
-        $genres = collect($allMovies)->pluck('genre')->unique()->sort();
-        $years = collect($allMovies)->pluck('year')->unique()->sort();
+        $genres = collect($allMovies)
+            ->pluck('genre')
+            ->unique()
+            ->sort()
+            ->values();
+
+
+        $years = collect($allMovies)
+            ->pluck('year')
+            ->unique()
+            ->sort()
+            ->values();
+
 
         return view('movies.index', [
-            'movies'       => $movies->values()->all(),
-            'allMovies'    => $allMovies,
-            'genres'       => $genres,
-            'years'        => $years,
-            'filterGenre'  => $filterGenre,
-            'filterYear'   => $filterYear,
-            'totalCount'   => count($this->readMovies()),
-            'shownCount'   => count($movies),
+
+            'movies' => $movies->values()->all(),
+
+            'allMovies' => $allMovies,
+
+            'genres' => $genres,
+
+            'years' => $years,
+
+            'filterGenre' => $filterGenre,
+
+            'filterYear' => $filterYear,
+
+            'totalCount' => count($allMovies),
+
+            'shownCount' => $movies->count(),
+
         ]);
     }
 
-    // Show details of a single movie
+
     public function show($id)
     {
         $movies = collect($this->readMovies());
-        $movie  = $movies->firstWhere('id', (int) $id);
+
+        $movie = $movies->firstWhere('id', (int) $id);
 
         if (!$movie) {
             abort(404, 'Movie not found.');
         }
 
-        return view('movies.show', compact('movie'));
+        return view('movies.show', [
+            'movie' => $movie
+        ]);
+    }
+
+
+
+    public function create()
+    {
+        return view('movies.create');
+    }
+
+    public function store(Request $request)
+    {
+
+
+        $validated = $request->validate([
+
+            'title' => 'required|string|max:100',
+
+            'genre' => 'required|in:Action,Comedy,Drama,Horror,Romance,Sci-Fi',
+
+            'duration' => 'required|numeric|min:1|max:500',
+
+            'year' => 'required|integer|min:1900|max:2026',
+
+            'featured' => 'required|in:0,1',
+
+        ]);
+
+
+        $movies = $this->readMovies();
+
+
+        $newId = 1;
+
+        if (count($movies) > 0) {
+
+            $ids = array_column($movies, 'id');
+
+            $newId = max($ids) + 1;
+        }
+
+
+        $newMovie = [
+
+            'id' => $newId,
+
+            'title' => $validated['title'],
+
+            'genre' => $validated['genre'],
+
+            'duration' => (int) $validated['duration'],
+
+            'year' => (int) $validated['year'],
+
+            'featured' => (bool) $validated['featured'],
+
+        ];
+
+        $movies[] = $newMovie;
+
+        $this->writeMovies($movies);
+
+        return redirect()
+            ->route('movies.index')
+            ->with('success', 'Movie added successfully!');
     }
 }
