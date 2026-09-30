@@ -5,7 +5,7 @@
 </head>
 <body>
     <h1>Store Products</h1>
-    <p>Prepared by: Timbal, Gregory F.</p>
+    <p>Prepared by: Timbal, Greggy F.</p>
 
     <table border="1" cellpadding="8">
         <tr>

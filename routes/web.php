@@ -1,8 +1,15 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\MoviesController;
+use Illuminate\Support\Facades\Route;
 
-Route::get('/movies', [MoviesController::class, 'index'])->name('movies.index');
-Route::get('/movies/{id}', [MoviesController::class, 'show'])->name('movies.show');
-Route::get('/movies/featured', [MoviesController::class, 'featured'])->name('movies.featured');
+Route::controller(MoviesController::class)->group(function () {
+    // List all movies with filtering options
+    Route::get('/movies', 'index')->name('movies.index');
+    
+    // Show individual movie details
+    Route::get('/movies/{id}', 'show')->name('movies.show');
+});
+
+// Redirect root to movies page
+Route::redirect('/', '/movies');
